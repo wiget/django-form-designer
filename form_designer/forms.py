@@ -27,8 +27,8 @@ class DesignedForm(forms.Form):
             else:
                 def_field.initial = initial_data.getlist(def_field.name)
         field = get_class(def_field.field_class)(**def_field.get_form_field_init_args())
-        if field.placeholder:
-            field.widget.attrs['placeholder'] = field.placeholder
+        if def_field.placeholder:
+            field.widget.attrs['placeholder'] = def_field.placeholder
         self.fields[def_field.name] = field
         if isinstance(field, forms.FileField):
             self.file_fields.append(def_field)
