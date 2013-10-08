@@ -50,8 +50,8 @@ class FormDefinition(models.Model):
     mail_subject = TemplateCharField(_('email subject'), max_length=255, help_text=('Your form fields are available as template context. Example: "Contact form {{ subject }}" if you have a field named `subject`.'), blank=True, null=True)
     mail_uploaded_files  = models.BooleanField(_('Send uploaded files as email attachments'), default=True)
     method = models.CharField(_('method'), max_length=10, default="POST", choices = (('POST', 'POST'), ('GET', 'GET')))
-    success_message = models.CharField(_('success message'), max_length=255, blank=True, null=True)
-    error_message = models.CharField(_('error message'), max_length=255, blank=True, null=True)
+    success_message = models.TextField(_('success message'), max_length=255, blank=True, null=True)
+    error_message = models.TextField(_('error message'), max_length=255, blank=True, null=True)
     submit_label = models.CharField(_('submit button label'), max_length=255, blank=True, null=True)
     log_data = models.BooleanField(_('log form data'), help_text=_('Logs all form submissions to the database.'), default=True)
     save_uploaded_files  = models.BooleanField(_('save uploaded files'), help_text=_('Saves all uploaded files using server storage.'), default=True)
@@ -176,7 +176,7 @@ class FormDefinition(models.Model):
     @property
     def submit_flag_name(self):
         name = settings.SUBMIT_FLAG_NAME % self.name
-        # make sure we are not overriding one of the actual form fields 
+        # make sure we are not overriding one of the actual form fields
         while self.formdefinitionfield_set.filter(name__exact=name).count() > 0:
             name += '_'
         return name
@@ -190,6 +190,7 @@ class FormDefinitionField(models.Model):
 
     name = models.SlugField(_('name'), max_length=255)
     label = models.CharField(_('label'), max_length=255, blank=True, null=True)
+    placeholder = models.CharField(_('placeholder'), max_length=255, blank=True, null=True)
     required = models.BooleanField(_('required'), default=True)
     include_result = models.BooleanField(_('include in result'), help_text=('If this is disabled, the field value will not be included in logs and e-mails generated from form data.'), default=True)
     widget = models.CharField(_('widget'), default='', choices=settings.WIDGET_CLASSES, max_length=255, blank=True, null=True)
@@ -225,7 +226,7 @@ class FormDefinitionField(models.Model):
     def ____init__(self, field_class=None, name=None, required=None, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
         super(FormDefinitionField, self).__init__(*args, **kwargs)
         self.name = name
-        self.field_class = field_class  
+        self.field_class = field_class
         self.required = required
         self.widget = widget
         self.label = label
@@ -311,7 +312,7 @@ class FormLog(models.Model):
 
     def __unicode__(self):
         return "%s (%s)" % (self.form_definition.title or  \
-            self.form_definition.name, self.created) 
+            self.form_definition.name, self.created)
 
     def get_data(self):
         if self._data:
@@ -357,7 +358,7 @@ class FormLog(models.Model):
 
     def save(self, *args, **kwargs):
         super(FormLog, self).save(*args, **kwargs)
-        if self._data: 
+        if self._data:
             # safe form data and then clear temporary variable
             for value in self.values.all():
                 value.delete()
@@ -378,7 +379,7 @@ class FormValue(models.Model):
         value = PickledObjectField(_('value'), null=True, blank=True)
     else:
         # otherwise just use a TextField, with the drawback that
-        # all values will just be stored as unicode strings, 
+        # all values will just be stored as unicode strings,
         # but you can easily query the database for form results.
         value = models.TextField(_('value'), null=True, blank=True)
 

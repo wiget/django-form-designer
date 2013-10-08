@@ -16,7 +16,7 @@ class FormDefinitionFieldInline(admin.StackedInline):
     extra = 1
     fieldsets = [
         (_('Basic'), {'fields': ['name', 'field_class', 'required', 'initial']}),
-        (_('Display'), {'fields': ['label', 'widget', 'help_text', 'position', 'include_result']}),
+        (_('Display'), {'fields': ['label', 'placeholder', 'widget', 'help_text', 'position', 'include_result']}),
         (_('Text'), {'fields': ['max_length', 'min_length']}),
         (_('Numbers'), {'fields': ['max_value', 'min_value', 'max_digits', 'decimal_places']}),
         (_('Regex'), {'fields': ['regex']}),
@@ -51,7 +51,7 @@ class FormLogAdmin(admin.ModelAdmin):
     for class_path in settings.EXPORTER_CLASSES:
         cls = get_class(class_path)
         if cls.is_enabled():
-            exporter_classes[cls.export_format()] = cls 
+            exporter_classes[cls.export_format()] = cls
             exporter_classes_ordered.append(cls)
 
     def get_exporter_classes(self):
@@ -63,7 +63,7 @@ class FormLogAdmin(admin.ModelAdmin):
         for cls in self.get_exporter_classes():
             desc = _("Export selected %%(verbose_name_plural)s as %s") % cls.export_format()
             actions[cls.export_format()] = (cls.export_view, cls.export_format(), desc)
-            
+
         return actions
 
     # Disabling all edit links: Hack as found at http://stackoverflow.com/questions/1618728/disable-link-to-edit-object-in-djangos-admin-display-list-only
@@ -114,7 +114,7 @@ class FormLogAdmin(admin.ModelAdmin):
         except (TypeError, KeyError):
             query_string = ''
 
-        exporter_links = [] 
+        exporter_links = []
         for cls in self.get_exporter_classes():
             url = reverse('admin:form_designer_export', args=(cls.export_format(),))+query_string
             exporter_links.append({'url': url, 'label': _('Export view as %s') % cls.export_format()})
